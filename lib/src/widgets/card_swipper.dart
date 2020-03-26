@@ -1,29 +1,34 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_swiper/flutter_swiper.dart';
+import 'package:movies/src/models/movie.dart';
 
 class CardSwipper extends StatelessWidget {
-  final List<dynamic> movies;
+  final List<Movie> movies;
 
   CardSwipper({@required this.movies});
 
   @override
   Widget build(BuildContext context) {
+    final _screenSize = MediaQuery.of(context).size;
+
     return Container(
-      height: 300.0,
       padding: EdgeInsets.only(top: 10.0),
-      width: double.infinity,
       child: Swiper(
-        itemBuilder: (BuildContext context, int index) {
-          return new Image.network(
-            "http://via.placeholder.com/350x150",
-            fit: BoxFit.fill,
-          );
-        },
-        itemCount: 3,
-        pagination: new SwiperPagination(),
-        control: new SwiperControl(),
-        itemWidth: 200.0,
+        itemWidth: _screenSize.width * 0.6,
+        itemHeight: _screenSize.height * 0.5,
         layout: SwiperLayout.STACK,
+        itemCount: movies.length,
+        itemBuilder: (BuildContext context, int index) {
+          return ClipRRect(
+              borderRadius: BorderRadius.circular(20.0),
+              child: FadeInImage(
+                image: NetworkImage(
+                  movies[index].getPosterImg(),
+                ),
+                placeholder:AssetImage('assets/img/loading.gif') ,
+                fit: BoxFit.fill,
+              ));
+        },
       ),
     );
   }

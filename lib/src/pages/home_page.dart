@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:movies/src/models/movie.dart';
+import 'package:movies/src/providers/movies_provider.dart';
 import 'package:movies/src/widgets/card_swipper.dart';
 
 class HomePage extends StatelessWidget {
+  final MoviesProvider moviesProvider = MoviesProvider();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -16,7 +20,6 @@ class HomePage extends StatelessWidget {
           ],
         ),
         body: Container(
-          color: Colors.red,
           child: Column(
             children: <Widget>[
               _swipperTarjets(),
@@ -26,8 +29,17 @@ class HomePage extends StatelessWidget {
   }
 
   Widget _swipperTarjets() {
-    return CardSwipper(
-      movies: [1, 2, 3, 4, 5],
+    return FutureBuilder(
+      future: moviesProvider.getOnCinemas(),
+      builder: (BuildContext context, AsyncSnapshot<List<Movie>> snapshot) {
+        if (snapshot.hasData) {
+          return CardSwipper(movies: snapshot.data);
+        }
+        return Container(
+          height: 400.0,
+          child: Center(child: CircularProgressIndicator()),
+        );
+      },
     );
   }
 }
