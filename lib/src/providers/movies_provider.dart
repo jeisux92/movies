@@ -1,16 +1,19 @@
 import 'dart:async';
 
+import 'package:movies/src/models/actor.dart';
 import 'package:movies/src/models/movie.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 class MoviesProvider {
-  String _apiKey = 'cdf449483f6859c51996711abcb4990c';
   String _url = 'api.themoviedb.org';
-  String _languaje = 'es-CO';
   int _popularesPage = 0;
   bool _loading = false;
   List<Movie> _populars = [];
+  final queryStrings = {
+    'api_key': 'cdf449483f6859c51996711abcb4990c',
+    'language': 'es-CO',
+  };
 
   final StreamController<List<Movie>> _popularsStreamController =
       StreamController<List<Movie>>.broadcast();
@@ -24,12 +27,7 @@ class MoviesProvider {
   Stream<List<Movie>> get popularsStream => _popularsStreamController.stream;
 
   Future<List<Movie>> getOnCinemas() async {
-    final queryStrings = {
-      'api_key': _apiKey,
-      'language': _languaje,
-    };
     final url = Uri.https(_url, '3/movie/upcoming', queryStrings);
-
     return await _processResponse(url);
   }
 
@@ -39,12 +37,11 @@ class MoviesProvider {
     }
     _loading = true;
     _popularesPage++;
-    final queryStrings = {
-      'api_key': _apiKey,
-      'language': _languaje,
-      'page': _popularesPage.toString()
+    final queryString = {
+      'page': _popularesPage.toString(),
+      ...queryStrings,
     };
-    final url = Uri.https(_url, '3/movie/popular/', queryStrings);
+    final url = Uri.https(_url, '3/movie/popular/', queryString);
     final List<Movie> response = await _processResponse(url);
     _populars.addAll(response);
     popularsSink(_populars);
@@ -52,10 +49,29 @@ class MoviesProvider {
     return response;
   }
 
+  Future<List<Actor>> getCast(int peliId) async {
+    final url = Uri.https(_url, '3/movie/$peliId/credits', queryStrings);
+    final resp = await http.get(url);
+    final decode = json.decode(resp.body);
+    final cast = new Cast.fromJsonMap(decode['cast']);
+    return cast.actors;
+  }
+
   Future<List<Movie>> _processResponse(Uri url) async {
     final response = await http.get(url);
     final decodeData = json.decode(response.body);
     final movies = new Movies.fromJsonList(decodeData["results"]);
     return movies.movies;
+  }
+
+  Future<List<Movie>> searchMovie(String query) async {
+    final queryString = {
+      'query': query,
+      ...queryStrings,
+    };
+
+    final url = Uri.https(_url, '3/search/movie', queryString);
+    final response = await _processResponse(url);
+    return response;
   }
 }

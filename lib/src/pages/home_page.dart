@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:movies/src/models/movie.dart';
 import 'package:movies/src/providers/movies_provider.dart';
+import 'package:movies/src/search/search_delegate.dart';
 import 'package:movies/src/widgets/card_swipper.dart';
 import 'package:movies/src/widgets/movie_horizontal.dart';
 
@@ -10,17 +11,20 @@ class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     _moviesProvider.getPopulars();
-    final _screenSize = MediaQuery.of(context).size;
-    print(_screenSize.width);
 
     return Scaffold(
         appBar: AppBar(
-          title: Text('movies on cinenema!'),
+          title: Text('Movies on cinenema!'),
           backgroundColor: Colors.indigoAccent,
           actions: <Widget>[
             IconButton(
               icon: Icon(Icons.search),
-              onPressed: () {},
+              onPressed: () {
+                showSearch(
+                  context: context,
+                  delegate: DataSearch(),
+                );
+              },
             )
           ],
         ),
@@ -28,6 +32,7 @@ class HomePage extends StatelessWidget {
           child: Column(
             children: <Widget>[
               _swipperTarjets(context),
+              Text(MediaQuery.of(context).size.height.toString()),
               _footer(context),
             ],
           ),
@@ -56,7 +61,7 @@ class HomePage extends StatelessWidget {
       width: double.infinity,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
+        children: <Widget>[          
           Container(
             padding: EdgeInsets.only(left: 20.0),
             child: Text(

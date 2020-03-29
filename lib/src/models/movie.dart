@@ -1,8 +1,6 @@
 class Movies {
   List<Movie> movies = [];
 
-  Movies();
-
   Movies.fromJsonList(List<dynamic> jsonList) {
     if (jsonList == null) {
       return;
@@ -29,7 +27,7 @@ class Movie {
   double voteAverage;
   String overview;
   String releaseDate;
-
+  String uId;
   Movie({
     this.popularity,
     this.voteCount,
