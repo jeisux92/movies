@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:movies/src/models/actor.dart';
 import 'package:movies/src/models/movie.dart';
 import 'dart:convert';
@@ -28,7 +27,10 @@ class MoviesProvider {
 
   Future<List<Movie>> getOnCinemas() async {
     final url = Uri.https(_url, '3/movie/upcoming', queryStrings);
-    return await _processResponse(url);
+    final response = await http.get(url);
+    final decodeData = json.decode(response.body);
+    final movies = new Movies.fromJsonList(decodeData["results"]);
+    return movies.movies;
   }
 
   Future<List<Movie>> getPopulars() async {
@@ -42,11 +44,15 @@ class MoviesProvider {
       ...queryStrings,
     };
     final url = Uri.https(_url, '3/movie/popular/', queryString);
-    final List<Movie> response = await _processResponse(url);
-    _populars.addAll(response);
+
+    final response = await http.get(url);
+    final decodeData = json.decode(response.body);
+    final movies = new Movies.fromJsonList(decodeData["results"]);
+
+    _populars.addAll(movies.movies);
     popularsSink(_populars);
     _loading = false;
-    return response;
+    return movies.movies;
   }
 
   Future<List<Actor>> getCast(int peliId) async {
@@ -57,13 +63,6 @@ class MoviesProvider {
     return cast.actors;
   }
 
-  Future<List<Movie>> _processResponse(Uri url) async {
-    final response = await http.get(url);
-    final decodeData = json.decode(response.body);
-    final movies = new Movies.fromJsonList(decodeData["results"]);
-    return movies.movies;
-  }
-
   Future<List<Movie>> searchMovie(String query) async {
     final queryString = {
       'query': query,
@@ -71,7 +70,10 @@ class MoviesProvider {
     };
 
     final url = Uri.https(_url, '3/search/movie', queryString);
-    final response = await _processResponse(url);
-    return response;
+
+    final response = await http.get(url);
+    final decodeData = json.decode(response.body);
+    final movies = new Movies.fromJsonList(decodeData["results"]);
+    return movies.movies;
   }
 }

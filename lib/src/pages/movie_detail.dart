@@ -4,18 +4,17 @@ import 'package:movies/src/models/movie.dart';
 import 'package:movies/src/providers/movies_provider.dart';
 
 class MovieDetail extends StatelessWidget {
+  Size _size;
   @override
   Widget build(BuildContext context) {
     final Movie movie = ModalRoute.of(context).settings.arguments;
+    _size = MediaQuery.of(context).size;
     return Scaffold(
       body: CustomScrollView(
         slivers: <Widget>[
           _createAppBar(movie),
           SliverList(
             delegate: SliverChildListDelegate([
-              SizedBox(
-                height: 10.0,
-              ),
               _titlePoster(context, movie),
               _description(movie),
               _createCasting(movie)
@@ -30,7 +29,7 @@ class MovieDetail extends StatelessWidget {
     return SliverAppBar(
       elevation: 2.0,
       backgroundColor: Colors.redAccent,
-      expandedHeight: 150.0,
+      expandedHeight: _size.height * 0.25,
       floating: true,
       pinned: true,
       flexibleSpace: FlexibleSpaceBar(
@@ -49,7 +48,9 @@ class MovieDetail extends StatelessWidget {
 
   Widget _titlePoster(BuildContext context, Movie movie) {
     return Container(
-        padding: EdgeInsets.symmetric(horizontal: 20.0),
+        height: _size.height * 0.25,
+        color: Colors.red,
+        padding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 5.0),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
@@ -59,7 +60,7 @@ class MovieDetail extends StatelessWidget {
                 borderRadius: BorderRadius.circular(20.0),
                 child: Image.network(
                   movie.getPosterImg(),
-                  height: 150.0,
+                  height: _size.height * 0.25,
                 ),
               ),
             ),
@@ -96,6 +97,8 @@ class MovieDetail extends StatelessWidget {
 
   Widget _description(Movie movie) {
     return Container(
+      color: Colors.green,
+      height: _size.height * 0.25,
       padding: EdgeInsets.symmetric(horizontal: 10.0, vertical: 20.0),
       child: Text(
         movie.overview,
@@ -106,47 +109,48 @@ class MovieDetail extends StatelessWidget {
 
   Widget _createCasting(Movie movie) {
     final movieProvider = MoviesProvider();
-    return FutureBuilder(
-      future: movieProvider.getCast(movie.id),
-      builder: (BuildContext context, AsyncSnapshot<List<Actor>> snapshot) {
-        if (snapshot.hasData) {
-          return _createActorsPageView(snapshot.data);
-        }
-        return Center(
-          child: CircularProgressIndicator(),
-        );
-      },
-    );
-  }
-
-  Widget _createActorsPageView(List<Actor> actors) {
-    return SizedBox(
-      height: 200.0,
-      child: PageView.builder(
-        pageSnapping: false,
-        controller: PageController(
-          viewportFraction: 0.3,
-          initialPage: 1,
-        ),
-        itemCount: actors.length,
-        itemBuilder: (BuildContext context, int index) {
-          return _actorCard(actors[index]);
+    return Container(
+      height: _size.height * 0.25,
+      color:Colors.blue,
+      child: FutureBuilder(
+        future: movieProvider.getCast(movie.id),
+        builder: (BuildContext context, AsyncSnapshot<List<Actor>> snapshot) {
+          if (snapshot.hasData) {
+            return _createActorsPageView(snapshot.data);
+          }
+          return Center(
+            child: CircularProgressIndicator(),
+          );
         },
       ),
     );
   }
 
+  Widget _createActorsPageView(List<Actor> actors) {
+    return PageView.builder(
+      pageSnapping: false,
+      controller: PageController(
+        viewportFraction: 0.3,
+        initialPage: 1,
+      ),
+      itemCount: actors.length,
+      itemBuilder: (BuildContext context, int index) {
+        return _actorCard(actors[index]);
+      },
+    );
+  }
+
   Widget _actorCard(Actor actor) {
-    print(actor.name);
     return Column(
       children: <Widget>[
-        ClipRRect(
-          borderRadius: BorderRadius.circular(20.0),
-          child: FadeInImage(
-            image: NetworkImage(actor.getPhoto),
-            placeholder: AssetImage('assets/img/no-image.jpg'),
-            height: 150.0,
-            fit: BoxFit.cover,
+        Expanded(
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(20.0),
+            child: FadeInImage(
+              image: NetworkImage(actor.getPhoto),
+              placeholder: AssetImage('assets/img/no-image.jpg'),              
+              fit: BoxFit.fill,
+            ),
           ),
         ),
         Text(

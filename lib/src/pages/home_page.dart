@@ -30,9 +30,9 @@ class HomePage extends StatelessWidget {
         ),
         body: Container(
           child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: <Widget>[
               _swipperTarjets(context),
-              Text(MediaQuery.of(context).size.height.toString()),
               _footer(context),
             ],
           ),
@@ -58,10 +58,10 @@ class HomePage extends StatelessWidget {
     final _screenSize = MediaQuery.of(context).size;
 
     return Container(
-      width: double.infinity,
+      
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[          
+        children: <Widget>[
           Container(
             padding: EdgeInsets.only(left: 20.0),
             child: Text(
@@ -72,20 +72,21 @@ class HomePage extends StatelessWidget {
           SizedBox(
             height: 5.0,
           ),
-          StreamBuilder(
-            stream: _moviesProvider.popularsStream,
-            builder:
-                (BuildContext context, AsyncSnapshot<List<Movie>> snapshot) {
-              if (snapshot.hasData) {
-                return MovieHorizontal(
-                  movies: snapshot.data,
-                  nextPage: _moviesProvider.getPopulars,
-                );
-              }
-              return Container(
-                  height: _screenSize.height * 0.3,
-                  child: Center(child: CircularProgressIndicator()));
-            },
+          Container(
+            height: _screenSize.height * 0.3,
+            child: StreamBuilder(
+              stream: _moviesProvider.popularsStream,
+              builder:
+                  (BuildContext context, AsyncSnapshot<List<Movie>> snapshot) {
+                if (snapshot.hasData) {
+                  return MovieHorizontal(
+                    movies: snapshot.data,
+                    nextPage: _moviesProvider.getPopulars,
+                  );
+                }
+                return Center(child: CircularProgressIndicator());
+              },
+            ),
           ),
         ],
       ),
