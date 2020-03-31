@@ -27,10 +27,14 @@ class MoviesProvider {
 
   Future<List<Movie>> getOnCinemas() async {
     final url = Uri.https(_url, '3/movie/upcoming', queryStrings);
-    final response = await http.get(url);
-    final decodeData = json.decode(response.body);
-    final movies = new Movies.fromJsonList(decodeData["results"]);
-    return movies.movies;
+    try {
+      final response = await http.get(url);
+      final decodeData = json.decode(response.body);
+      final movies = new Movies.fromJsonList(decodeData["results"]);
+      return movies.movies;
+    } catch (e) {
+      return [];
+    }
   }
 
   Future<List<Movie>> getPopulars() async {
@@ -44,15 +48,18 @@ class MoviesProvider {
       ...queryStrings,
     };
     final url = Uri.https(_url, '3/movie/popular/', queryString);
+    try {
+      final response = await http.get(url);
+      final decodeData = json.decode(response.body);
+      final movies = new Movies.fromJsonList(decodeData["results"]);
 
-    final response = await http.get(url);
-    final decodeData = json.decode(response.body);
-    final movies = new Movies.fromJsonList(decodeData["results"]);
-
-    _populars.addAll(movies.movies);
-    popularsSink(_populars);
-    _loading = false;
-    return movies.movies;
+      _populars.addAll(movies.movies);
+      popularsSink(_populars);
+      _loading = false;
+      return movies.movies;
+    } catch (e) {
+      return [];
+    }
   }
 
   Future<List<Actor>> getCast(int peliId) async {

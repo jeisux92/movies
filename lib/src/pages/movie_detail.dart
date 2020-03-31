@@ -28,14 +28,15 @@ class MovieDetail extends StatelessWidget {
   Widget _createAppBar(Movie movie) {
     return SliverAppBar(
       elevation: 2.0,
-      backgroundColor: Colors.redAccent,
       expandedHeight: _size.height * 0.25,
       floating: true,
       pinned: true,
       flexibleSpace: FlexibleSpaceBar(
         centerTitle: true,
-        title: Text(movie.title,
-            style: TextStyle(color: Colors.white, fontSize: 16.0)),
+        title: Text(
+          movie.title,
+          style: TextStyle(color: Colors.white, fontSize: 16.0),
+        ),
         background: FadeInImage(
           image: NetworkImage(movie.getBackgroundImg()),
           placeholder: AssetImage('assets/img/loading.gif'),
@@ -49,7 +50,6 @@ class MovieDetail extends StatelessWidget {
   Widget _titlePoster(BuildContext context, Movie movie) {
     return Container(
         height: _size.height * 0.25,
-        color: Colors.red,
         padding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 5.0),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -97,8 +97,7 @@ class MovieDetail extends StatelessWidget {
 
   Widget _description(Movie movie) {
     return Container(
-      color: Colors.green,
-      height: _size.height * 0.25,
+      constraints: BoxConstraints(minHeight: _size.height * 0.21),
       padding: EdgeInsets.symmetric(horizontal: 10.0, vertical: 20.0),
       child: Text(
         movie.overview,
@@ -111,7 +110,6 @@ class MovieDetail extends StatelessWidget {
     final movieProvider = MoviesProvider();
     return Container(
       height: _size.height * 0.25,
-      color:Colors.blue,
       child: FutureBuilder(
         future: movieProvider.getCast(movie.id),
         builder: (BuildContext context, AsyncSnapshot<List<Actor>> snapshot) {
@@ -135,7 +133,10 @@ class MovieDetail extends StatelessWidget {
       ),
       itemCount: actors.length,
       itemBuilder: (BuildContext context, int index) {
-        return _actorCard(actors[index]);
+        return Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: _actorCard(actors[index]),
+        );
       },
     );
   }
@@ -148,7 +149,7 @@ class MovieDetail extends StatelessWidget {
             borderRadius: BorderRadius.circular(20.0),
             child: FadeInImage(
               image: NetworkImage(actor.getPhoto),
-              placeholder: AssetImage('assets/img/no-image.jpg'),              
+              placeholder: AssetImage('assets/img/no-image.jpg'),
               fit: BoxFit.fill,
             ),
           ),

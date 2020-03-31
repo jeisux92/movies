@@ -32,33 +32,34 @@ class HomePage extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: <Widget>[
-              _swipperTarjets(context),
-              _footer(context),
+              Expanded(
+                flex: 2,
+                child: _swipperTarjets(context),
+              ),
+              Expanded(
+                flex: 1,
+                child: _footer(context),
+              ),
             ],
           ),
         ));
   }
 
   Widget _swipperTarjets(context) {
-    final _screenSize = MediaQuery.of(context).size;
     return Container(
-        height: _screenSize.height * 0.5,
         child: FutureBuilder(
-          future: _moviesProvider.getOnCinemas(),
-          builder: (BuildContext context, AsyncSnapshot<List<Movie>> snapshot) {
-            if (snapshot.hasData) {
-              return CardSwipper(movies: snapshot.data);
-            }
-            return Center(child: CircularProgressIndicator());
-          },
-        ));
+      future: _moviesProvider.getOnCinemas(),
+      builder: (BuildContext context, AsyncSnapshot<List<Movie>> snapshot) {
+        if (snapshot.hasData) {
+          return CardSwipper(movies: snapshot.data);
+        }
+        return Center(child: CircularProgressIndicator());
+      },
+    ));
   }
 
   Widget _footer(context) {
-    final _screenSize = MediaQuery.of(context).size;
-
     return Container(
-      
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
@@ -72,8 +73,7 @@ class HomePage extends StatelessWidget {
           SizedBox(
             height: 5.0,
           ),
-          Container(
-            height: _screenSize.height * 0.3,
+          Expanded(
             child: StreamBuilder(
               stream: _moviesProvider.popularsStream,
               builder:
@@ -84,7 +84,7 @@ class HomePage extends StatelessWidget {
                     nextPage: _moviesProvider.getPopulars,
                   );
                 }
-                return Center(child: CircularProgressIndicator());
+                return Center(child: CircularProgressIndicator(),);
               },
             ),
           ),
